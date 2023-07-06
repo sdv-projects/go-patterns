@@ -12,15 +12,15 @@ type DomainEventChannel struct {
 	mu       sync.Mutex
 }
 
-func (c *DomainEventChannel) Publish(ctx context.Context, events []DomainEvent) error {
+func (c *DomainEventChannel) Publish(ctx context.Context, events ...DomainEvent) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	riseMap := make(map[DomainEventHandler][]DomainEvent)
 
 	for _, e := range events {
-		if handlers, ok := c.handlers[e.GetType()]; ok {
-			for h, _ := range handlers {
+		if handlers, ok := c.handlers[e.GetEventType()]; ok {
+			for h := range handlers {
 				if _, ok := riseMap[h]; ok {
 					riseMap[h] = make([]DomainEvent, 0)
 				}
